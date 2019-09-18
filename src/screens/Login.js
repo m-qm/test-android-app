@@ -1,29 +1,29 @@
-import React, { Component } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import React, {Component} from 'react';
+import {View, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 
-import Pusher from "pusher-js/react-native";
+import Pusher from 'pusher-js/react-native';
 
-const pusher_app_key = "YOUR PUSHER APP KEY";
-const pusher_app_cluster = "YOUR PUSHER APP CLUSTER";
-const base_url = "YOUR HTTPS NGROK URL";
+const pusher_app_key = '800e21db54933d72d345';
+const pusher_app_cluster = 'eu';
+const base_url = 'http://fa0543a3.ngrok.io';
 
 class LoginScreen extends Component {
   static navigationOptions = {
-    title: "Login"
+    title: 'Login',
   };
 
   state = {
-    username: "",
-    enteredGame: false
+    username: '',
+    enteredGame: false,
   };
 
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super (props);
     this.pusher = null;
     this.myChannel = null;
   }
 
-  render() {
+  render () {
     return (
       <View style={styles.wrapper}>
         <View style={styles.container}>
@@ -32,22 +32,20 @@ class LoginScreen extends Component {
               <Text style={styles.label}>Enter your username</Text>
               <TextInput
                 style={styles.textInput}
-                onChangeText={username => this.setState({ username })}
+                onChangeText={username => this.setState ({username})}
                 value={this.state.username}
               />
             </View>
 
-            {!this.state.enteredGame && (
+            {!this.state.enteredGame &&
               <TouchableOpacity onPress={this.enterGame}>
                 <View style={styles.button}>
                   <Text style={styles.buttonText}>Login</Text>
                 </View>
-              </TouchableOpacity>
-            )}
+              </TouchableOpacity>}
 
-            {this.state.enteredGame && (
-              <Text style={styles.loadingText}>Loading...</Text>
-            )}
+            {this.state.enteredGame &&
+              <Text style={styles.loadingText}>Loading...</Text>}
           </View>
         </View>
       </View>
@@ -56,44 +54,46 @@ class LoginScreen extends Component {
 
   enterGame = async () => {
     const username = this.state.username;
+    console.log('entered')
 
     if (username) {
-      this.setState({
-        enteredGame: true
+      this.setState ({
+        enteredGame: true,
       });
 
-      this.pusher = new Pusher(pusher_app_key, {
+      this.pusher = new Pusher (pusher_app_key, {
         authEndpoint: `${base_url}/pusher/auth`,
         cluster: pusher_app_cluster,
         auth: {
-          params: { username: username }
+          params: {username: username},
         },
-        encrypted: true
+        encrypted: true,
       });
 
-      this.myChannel = this.pusher.subscribe(`private-user-${username}`);
-      this.myChannel.bind("pusher:subscription_error", status => {
-        Alert.alert(
-          "Error",
-          "Subscription error occurred. Please restart the app"
+      this.myChannel = this.pusher.subscribe (`private-user-${username}`);
+      this.myChannel.bind ('pusher:subscription_error', status => {
+        Alert.alert (
+          'Error',
+          'Subscription error occurred. Please restart the app'
         );
       });
 
-      this.myChannel.bind("pusher:subscription_succeeded", () => {
-        this.myChannel.bind("opponent-found", data => {
-          let opponent =
-            username == data.player_one ? data.player_two : data.player_one;
+      this.myChannel.bind ('pusher:subscription_succeeded', () => {
+        this.myChannel.bind ('opponent-found', data => {
+          let opponent = username == data.player_one
+            ? data.player_two
+            : data.player_one;
 
           const playerOneObjects = {
-            plank: "plankOne",
-            wall: "leftWall",
-            plankColor: "green"
+            plank: 'plankOne',
+            wall: 'leftWall',
+            plankColor: 'green',
           };
 
           const playerTwoObjects = {
-            plank: "plankTwo",
-            wall: "rightWall",
-            plankColor: "blue"
+            plank: 'plankTwo',
+            wall: 'rightWall',
+            plankColor: 'blue',
           };
 
           const isPlayerOne = username == data.player_one ? true : false;
@@ -111,17 +111,20 @@ class LoginScreen extends Component {
           const myWall = myObjects.wall;
           const opponentWall = opponentObjects.wall;
 
-          Alert.alert("Opponent found!", `Your plank color is ${myPlankColor}`);
+          Alert.alert (
+            'Opponent found!',
+            `Your plank color is ${myPlankColor}`
+          );
 
-          this.opponentChannel = this.pusher.subscribe(
+          this.opponentChannel = this.pusher.subscribe (
             `private-user-${opponent}`
           );
-          this.opponentChannel.bind("pusher:subscription_error", data => {
-            console.log("Error subscribing to opponent's channel: ", data);
+          this.opponentChannel.bind ('pusher:subscription_error', data => {
+            console.log ("Error subscribing to opponent's channel: ", data);
           });
 
-          this.opponentChannel.bind("pusher:subscription_succeeded", () => {
-            this.props.navigation.navigate("Game", {
+          this.opponentChannel.bind ('pusher:subscription_succeeded', () => {
+            this.props.navigation.navigate ('Game', {
               pusher: this.pusher,
               username: username,
               myChannel: this.myChannel,
@@ -135,13 +138,13 @@ class LoginScreen extends Component {
               opponentPlankColor: opponentPlankColor,
 
               myWall: myWall,
-              opponentWall: opponentWall
+              opponentWall: opponentWall,
             });
           });
 
-          this.setState({
-            username: "",
-            enteredGame: false
+          this.setState ({
+            username: '',
+            enteredGame: false,
           });
         });
       });
@@ -153,39 +156,39 @@ export default LoginScreen;
 
 const styles = {
   wrapper: {
-    flex: 1
+    flex: 1,
   },
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 20,
-    backgroundColor: "#FFF"
+    backgroundColor: '#FFF',
   },
   fieldContainer: {
-    marginTop: 20
+    marginTop: 20,
   },
   label: {
-    fontSize: 16
+    fontSize: 16,
   },
   textInput: {
     height: 40,
     marginTop: 5,
     marginBottom: 10,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderWidth: 1,
-    backgroundColor: "#eaeaea",
-    padding: 5
+    backgroundColor: '#eaeaea',
+    padding: 5,
   },
   button: {
-    alignSelf: "center",
-    marginTop: 10
+    alignSelf: 'center',
+    marginTop: 10,
   },
   buttonText: {
     fontSize: 18,
-    color: "#05a5d1"
+    color: '#05a5d1',
   },
   loadingText: {
-    alignSelf: "center"
-  }
+    alignSelf: 'center',
+  },
 };

@@ -30,7 +30,8 @@ app.get("/opponent-found", function(req, res) {
   var player_two = unique_users[1];
 
   console.log("opponent found: " + player_one + " and " + player_two);
-
+  console.log(pusher, player_one,
+                           player_two)
   pusher.trigger(
     ["private-user-" + player_one, "private-user-" + player_two],
     "opponent-found",
@@ -50,6 +51,8 @@ app.get("/start-game", function(req, res) {
 
   var player_one = unique_users[0];
   var player_two = unique_users[1];
+      console.log(pusher);
+
 
   console.log("start game: " + player_one + " and " + player_two);
 
@@ -60,8 +63,8 @@ app.get("/start-game", function(req, res) {
       start: true
     }
   );
-
   users = [];
+
 
   res.send("start game!");
 });
@@ -70,6 +73,8 @@ app.post("/pusher/auth", function(req, res) {
   var socketId = req.body.socket_id;
   var channel = req.body.channel_name;
   var username = req.body.username;
+
+
 
   users.push(username);
   console.log(username + " logged in");
